@@ -1,5 +1,3 @@
-package what.main;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -7,7 +5,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * The Class UserSettings.
+ * The Class Settings.
  * 
  * //TODO description
  * 
@@ -19,7 +17,7 @@ public class Settings {
 	private static Preferences prefs;
 
 	/** The set. */
-	private static HashSet<String> set = new HashSet<String>();
+	private static HashSet<Integer> torrentIdSet = new HashSet<Integer>();
 
 	/**
 	 * Instantiates a new user settings.
@@ -33,13 +31,12 @@ public class Settings {
 	 * @param refreshRate
 	 *            the refresh rate
 	 */
-	public Settings(String username, String password, ArrayList<Integer> monitoredForumIds, int refreshRate) {
+	public Settings(String username, String password, int refreshRate) {
 		prefs = Preferences.userNodeForPackage(this.getClass());
 		this.saveUsername(username);
 		this.savePassword(password);
-		this.saveMonitoredForumIds(monitoredForumIds);
 		this.saveRefreshRate(refreshRate);
-		set = loadSet();
+		torrentIdSet = loadSet();
 
 	}
 
@@ -48,7 +45,7 @@ public class Settings {
 	 */
 	public Settings() {
 		prefs = Preferences.userNodeForPackage(this.getClass());
-		set = loadSet();
+		torrentIdSet = loadSet();
 	}
 
 	/**
@@ -56,13 +53,13 @@ public class Settings {
 	 * 
 	 * @return the hash set
 	 */
-	private HashSet<String> loadSet() {
-		HashSet<String> set = new HashSet<String>();
-		String s = prefs.get("set", "");
+	private HashSet<Integer> loadSet() {
+		HashSet<Integer> set = new HashSet<Integer>();
+		String s = prefs.get("WhatBetterDownloader_set", "");
 		s = s.replace("[", "").replace("]", "").replaceAll("\\s+", "");
 		StringTokenizer st = new StringTokenizer(s, ",");
 		while (st.hasMoreTokens()) {
-			set.add(st.nextToken());
+			set.add(Integer.parseInt(st.nextToken()));
 		}
 		return set;
 	}
@@ -73,9 +70,9 @@ public class Settings {
 	 * @param s
 	 *            the s
 	 */
-	public static void addToSet(String s) {
-		set.add(s);
-		prefs.put("set", set.toString());
+	public static void addToSet(int s) {
+		torrentIdSet.add(s);
+		prefs.put("WhatBetterDownloader_setset", torrentIdSet.toString());
 
 	}
 
@@ -86,10 +83,9 @@ public class Settings {
 	 *             the backing store exception
 	 */
 	public void clearSettings() throws BackingStoreException {
-		prefs.remove("username");
-		prefs.remove("password");
-		prefs.remove("monitoredForumIds");
-		prefs.remove("refreshRate");
+		prefs.remove("WhatBetterDownloader_username");
+		prefs.remove("WhatBetterDownloader_password");
+		prefs.remove("WhatBetterDownloader_refreshRate");
 	}
 
 	/**
@@ -129,32 +125,12 @@ public class Settings {
 	}
 
 	/**
-	 * Gets the monitored forum ids.
-	 * 
-	 * @return the monitored forum ids
-	 */
-	public ArrayList<Integer> getMonitoredForumIds() {
-		String s = prefs.get("monitoredForumIds", "");
-		return stringToIntegerList(s);
-	}
-
-	/**
-	 * Save monitored forum ids.
-	 * 
-	 * @param monitoredForumIds
-	 *            the monitored forum ids
-	 */
-	public void saveMonitoredForumIds(ArrayList<Integer> monitoredForumIds) {
-		prefs.put("monitoredForumIds", monitoredForumIds.toString());
-	}
-
-	/**
 	 * Gets the username.
 	 * 
 	 * @return the username
 	 */
 	public String getUsername() {
-		return prefs.get("username", "");
+		return prefs.get("WhatBetterDownloader_username", "");
 	}
 
 	/**
@@ -164,7 +140,7 @@ public class Settings {
 	 *            the username
 	 */
 	public void saveUsername(String username) {
-		prefs.put("username", username);
+		prefs.put("WhatBetterDownloader_username", username);
 	}
 
 	/**
@@ -173,7 +149,7 @@ public class Settings {
 	 * @return the password
 	 */
 	public String getPassword() {
-		return prefs.get("password", "");
+		return prefs.get("WhatBetterDownloader_password", "");
 	}
 
 	/**
@@ -183,7 +159,7 @@ public class Settings {
 	 *            the password
 	 */
 	public void savePassword(String password) {
-		prefs.put("password", password);
+		prefs.put("WhatBetterDownloader_password", password);
 	}
 
 	/**
@@ -192,7 +168,7 @@ public class Settings {
 	 * @return the refresh rate
 	 */
 	public int getRefreshRate() {
-		return prefs.getInt("refreshRate", 15);
+		return prefs.getInt("WhatBetterDownloader_refreshRate", 15);
 	}
 
 	/**
@@ -202,7 +178,7 @@ public class Settings {
 	 *            the refresh rate
 	 */
 	public void saveRefreshRate(int refreshRate) {
-		prefs.putInt("refreshRate", refreshRate);
+		prefs.putInt("WhatBetterDownloader_refreshRate", refreshRate);
 	}
 
 	/**
@@ -210,8 +186,8 @@ public class Settings {
 	 * 
 	 * @return the sets the
 	 */
-	public static HashSet<String> getSet() {
-		return set;
+	public static HashSet<Integer> getSet() {
+		return torrentIdSet;
 	}
 
 }
