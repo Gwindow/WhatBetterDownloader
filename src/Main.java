@@ -14,7 +14,7 @@ import api.util.CouldNotLoadException;
  */
 public class Main {
 	/** The Constant SITE. */
-	private final static String SITE = "http://what.cd/";
+	private final static String SITE = "ssl.what.cd";
 
 	/** The executor. */
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -29,7 +29,9 @@ public class Main {
 	private String username, password;
 
 	/** The refresh rate. */
-	private int refreshRate;;
+	private int refreshRate;
+
+	private String downloadLocation;
 
 	/**
 	 * Instantiates a new main.
@@ -92,10 +94,10 @@ public class Main {
 		if (!settings.hasSettings()) {
 			login(false);
 			chooseRefereshRate();
+			chooseDownloadLocation();
 			saveSettings();
 		} else {
 			try {
-				settings = new Settings();
 				login(true);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -115,7 +117,7 @@ public class Main {
 		if (auto) {
 			try {
 				MySoup.login("login.php", settings.getUsername(), settings.getPassword());
-				System.out.println("Logged in \n");
+				System.out.println("Logged in");
 			} catch (CouldNotLoadException e) {
 				System.err.println("Could not login");
 			}
@@ -125,7 +127,7 @@ public class Main {
 					System.out.println("Enter username:");
 					username = scanner.nextLine();
 					System.out.println("Enter password:");
-					password = PasswordField.readPassword("");
+					password = scanner.nextLine();
 					break;
 				} catch (Exception e) {
 					System.err.println("Error parsing input");
@@ -137,7 +139,7 @@ public class Main {
 				System.err.println("Could not login");
 				System.exit(0);
 			}
-			System.out.println("\nLogged in\n");
+			System.out.println("\nLogged in");
 		}
 	}
 
@@ -158,7 +160,15 @@ public class Main {
 				System.err.println("Error parsing input");
 			}
 		}
-		System.out.println();
+	}
+
+	private void chooseDownloadLocation() {
+		System.out
+				.println("Enter location to download torrent files to.\nFor example, /home/example/downloads/ or C:\\Documents and Settings\\example\\Desktop\\");
+		while ((downloadLocation == null) || (downloadLocation.length() < 1)) {
+			downloadLocation = scanner.nextLine();
+		}
+		downloadLocation = downloadLocation.replace("\\", "/");
 	}
 
 	/**
@@ -169,6 +179,7 @@ public class Main {
 			settings.savePassword(password);
 			settings.saveUsername(username);
 			settings.saveRefreshRate(refreshRate);
+			settings.saveDownloadLocation(downloadLocation);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Could not save settings");
@@ -195,8 +206,10 @@ public class Main {
 	 * Start downloader thread.
 	 */
 	private void startDownloaderThread() {
-		executor.scheduleAtFixedRate(new Downloader(), 0, settings.getRefreshRate(), TimeUnit.MINUTES);
-
+		if ((settings.getDownloadLocation() != null) && (settings.getDownloadLocation().length() > 0)) {
+			executor.scheduleAtFixedRate(new Downloader(settings.getDownloadLocation()), 0, settings.getRefreshRate(),
+					TimeUnit.MINUTES);
+		}
 	}
 
 	/**

@@ -86,6 +86,7 @@ public class Settings {
 		prefs.remove("WhatBetterDownloader_username");
 		prefs.remove("WhatBetterDownloader_password");
 		prefs.remove("WhatBetterDownloader_refreshRate");
+		prefs.remove("WhatBetterDownloader_downloadLocation");
 	}
 
 	/**
@@ -188,6 +189,14 @@ public class Settings {
 	 */
 	public static HashSet<Integer> getSet() {
 		return torrentIdSet;
+	}
+
+	public void saveDownloadLocation(String string) {
+		prefs.put("WhatBetterDownloader_downloadLocation", string);
+	}
+
+	public String getDownloadLocation() {
+		return prefs.get("WhatBetterDownloader_downloadLocation", null);
 	}
 
 }
